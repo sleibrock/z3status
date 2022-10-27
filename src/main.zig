@@ -7,6 +7,7 @@ const systime = std.time;
 // local modules
 const Time = @import("Time.zig");
 const Load = @import("Load.zig");
+const Memory = @import("Memory.zig");
 
 // static defined vars
 const stdout = io.getStdOut().writer();
