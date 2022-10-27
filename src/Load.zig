@@ -14,13 +14,6 @@ const LoadErr = error { GeneralFail };
 pub const LoadDatum = struct {
     loads: [3]f64 = undefined,
 
-    /// Set some default values as a backup in case some failure occurs
-    pub fn init(self: *LoadDatum) void {
-        self.loads[0] = 0.0;
-        self.loads[1] = 0.0;
-        self.loads[2] = 0.0;
-    }
-
     pub fn update(self: *LoadDatum) LoadErr!void {
         var err_code = cStdlib.getloadavg(&self.loads, 3);
         switch (err_code) {

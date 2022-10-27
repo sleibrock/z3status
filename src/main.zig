@@ -26,10 +26,7 @@ fn seconds(n: u64) u64 {
 /// Utilizes and collects all information and cycles every loop
 pub fn main() !void {
     var time_d: Time.TimeDatum = undefined;
-    time_d.init();
-
     var load_d: Load.LoadDatum = undefined;
-    load_d.init();
 
     while (true) {
         time_d.update();

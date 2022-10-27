@@ -21,12 +21,9 @@ pub const TimeDatum = struct {
     chars_used: u64 = undefined,
     buffer: [80]u8 = undefined,
 
-    pub fn init(self: *TimeDatum) void {
+    pub fn update(self: *TimeDatum) void {
         _ = cTime.time(&self.time_raw);
         self.time_info = cTime.localtime(&self.time_raw).*;
-    }
-
-    pub fn update(self: *TimeDatum) void {
         self.chars_used = cTime.strftime(
             &self.buffer, 80, "%x - %I:%M%p", &self.time_info
         );
