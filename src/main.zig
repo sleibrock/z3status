@@ -2,10 +2,13 @@
 
 const std = @import("std");
 const io = std.io;
-const time = std.time;
+const systime = std.time;
 
-const cTime = @cImport(@cInclude("time.h"));
+// local modules
+const Time = @import("Time.zig");
+const Load = @import("Load.zig");
 
+// static defined vars
 const stdout = io.getStdOut().writer();
 
 /// Convert an integer into nanoseconds
@@ -19,17 +22,24 @@ fn seconds(n: u64) u64 {
     return x * 1000000000;
 }
 
+/// This is the main function to handle the status bar.
+/// Utilizes and collects all information and cycles every loop
 pub fn main() !void {
-    var time_raw: cTime.time_t = undefined;
-    var time_info: cTime.struct_tm = undefined;
-    var buf: [80]u8 = undefined;
+    var time_d: Time.TimeDatum = undefined;
+    time_d.init();
 
-    _ = cTime.time(&time_raw);
-    time_info = cTime.localtime(&time_raw).*;
+    var load_d: Load.LoadDatum = undefined;
+    load_d.init();
+
     while (true) {
-        _ = cTime.strftime(&buf, 80, "%x - %I:%M%p", &time_info);
-        try stdout.print("{s}\n", .{buf});
-        time.sleep(seconds(15));
+        time_d.update();
+        try load_d.update();
+        try stdout.print(
+            "Load: 1m={d}, 5m={d}, 15m={d} | ",
+            .{load_d.loads[0], load_d.loads[1], load_d.loads[2]}
+        );
+        try stdout.print("{s}\n", .{time_d.buffer[0..time_d.chars_used]});
+        systime.sleep(seconds(15));
     }
     return;
 }
