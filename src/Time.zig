@@ -13,7 +13,15 @@
 /// * initialize using var t: Time.TimeDatum = undefined;
 /// * update using TimeDatum.update()
 
+const std = @import("std");
+const fs = std.fs;
 const cTime = @cImport(@cInclude("time.h"));
+
+const TimeErr = error {
+    Update, // failed to update time from system
+    IO,     // failed to output text
+    Other,  // some other error
+};
 
 pub const TimeDatum = struct {
     time_raw: cTime.time_t = undefined,
@@ -21,12 +29,13 @@ pub const TimeDatum = struct {
     chars_used: u64 = undefined,
     buffer: [80]u8 = undefined,
 
-    pub fn update(self: *TimeDatum) void {
-        _ = cTime.time(&self.time_raw);
+    pub fn update(self: *TimeDatum) TimeErr!void {
+        _ = cTime.time(&self.time_raw); // returns void
         self.time_info = cTime.localtime(&self.time_raw).*;
         self.chars_used = cTime.strftime(
             &self.buffer, 80, "%x - %I:%M%p", &self.time_info
         );
+        return;
     }
 };
 

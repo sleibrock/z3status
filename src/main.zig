@@ -30,7 +30,7 @@ pub fn main() !void {
     var load_d: Load.LoadDatum = undefined;
 
     while (true) {
-        time_d.update();
+        try time_d.update();
         try load_d.update();
         try stdout.print(
             "Load: 1m={d}, 5m={d}, 15m={d} | ",
