@@ -5,6 +5,7 @@ const io = std.io;
 
 const stdout = io.getStdOut().writer();
 
+
 const LoadGauge = enum {
     Low, Medium, High,
 
@@ -26,16 +27,16 @@ pub const StatusIO = struct {
     /// Take in a slice to an array containing Time info
     pub fn time(self: *StatusIO, buf: []u8, len: u64) !void {
         self.flags = 0;
-
         try stdout.print("{s} ", .{buf[0..len]});
     }
 
     pub fn load(self: *StatusIO, buf: [3]f64) !void {
-        // round to two digits
-        var load1m = buf[0] * 100.0;
-        load1m = @round(load1m);
-        load1m = load1m * 0.01;
-        try stdout.print("{d} {c} ", .{load1m, self.separator});
+        // compare values, format with pretty text, output 2 decimals 
+        try stdout.print("{d:.2} {c} ", .{buf[0], self.separator});
+    }
+
+    pub fn memory(self: *StatusIO, total: u64) !void {
+        try stdout.print("{d} bytes total {c} ", .{total, self.separator});
     }
 
     /// Print out a newline and kill a sequence

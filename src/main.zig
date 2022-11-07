@@ -29,6 +29,7 @@ fn seconds(n: u64) u64 {
 pub fn main() !void {
     var time_d: Time.TimeDatum = undefined;
     var load_d: Load.LoadDatum = undefined;
+    var mem_d: Memory.MemDatum = undefined;
     var status_io: StatusIO.StatusIO = undefined;
     status_io.separator = '|';
 
@@ -36,8 +37,10 @@ pub fn main() !void {
         // try collecting info from system by updating structs 
         try time_d.update();
         try load_d.update();
+        try mem_d.update();
 
         // print all the output with the statusIO module
+        try status_io.memory(mem_d.ram_total);
         try status_io.load(load_d.loads);
         try status_io.time(&time_d.buffer, time_d.chars_used);
         try status_io.newline();
