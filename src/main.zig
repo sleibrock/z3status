@@ -33,11 +33,12 @@ pub fn main() !void {
     status_io.separator = '|';
 
     while (true) {
+        // try collecting info from system by updating structs 
         try time_d.update();
         try load_d.update();
 
+        // print all the output with the statusIO module
         try status_io.load(load_d.loads);
-        
         try status_io.time(&time_d.buffer, time_d.chars_used);
         try status_io.newline();
         
