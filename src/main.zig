@@ -5,49 +5,33 @@ const io = std.io;
 const systime = std.time;
 
 // local modules
+const Utils = @import("utils.zig");
+const Settings = @import("Settings.zig");
 const Time = @import("Time.zig");
-const Load = @import("Load.zig");
-const Memory = @import("Memory.zig");
-const StatusIO = @import("StatusIO.zig");
+//const Load = @import("Load.zig");
+//const Memory = @import("Memory.zig");
+//const StatusIO = @import("StatusIO.zig");
 
 // static defined vars
-//const stdout = io.getStdOut().writer();
+const stdout = io.getStdOut().writer();
 
-/// Convert an integer into nanoseconds
-/// Has a check to prevent a possible u64 overflow
-/// so it caps out at 60 seconds sleep time
-fn seconds(n: u64) u64 {
-    var x: u64 = switch (n) {
-        0...60 => n,
-        else => 60,
-    };
-    return x * 1000000000;
-}
+var chars: [128]u8 = undefined;
 
 /// This is the main function to handle the status bar.
 /// Utilizes and collects all information and cycles every loop
 pub fn main() !void {
-    var time_d: Time.TimeDatum = undefined;
-    var load_d: Load.LoadDatum = undefined;
-    var mem_d: Memory.MemDatum = undefined;
-    var status_io: StatusIO.StatusIO = undefined;
-    status_io.separator = '|';
-
+    var index: usize = 0;
+    while (index < 128) : (index += 1) {
+        chars[index] = ' ';
+    }
     while (true) {
-        // try collecting info from system by updating structs 
-        try time_d.update();
-        try load_d.update();
-        try mem_d.update();
-
         // print all the output with the statusIO module
-        try status_io.memory(mem_d.ram_total);
-        try status_io.load(load_d.loads);
-        try status_io.time(&time_d.buffer, time_d.chars_used);
-        try status_io.newline();
-        
-        systime.sleep(seconds(15));
+        try Time.update(107, 127, &chars);
+
+        try stdout.print("{s}\n", .{chars});
+        systime.sleep(Utils.seconds(15));
     }
     return;
 }
 
-// end source
+// end main.zig
