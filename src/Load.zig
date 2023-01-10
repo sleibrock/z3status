@@ -5,23 +5,31 @@
 /// System load is usually determined by using getloadavg(3),
 /// and can return an error code -1 on fail. Thus this must
 /// be wrapped up in Zig in some meaningful capacity.
-
+const std = @import("std");
+const fmt = std.fmt;
+const Utils = @import("utils.zig");
 const cStdlib = @cImport(@cInclude("stdlib.h"));
 
-const LoadErr = error { GeneralFail };
+const S = @import("Settings.zig");
 
+pub fn update(start: u8, end: u8, buf: *[128]u8, s: S.AppSettings) Utils.UtilErr!u8 {
+    _ = s;
+    var loads: [3]f64 = undefined;
 
-pub const LoadDatum = struct {
-    loads: [3]f64 = undefined,
-
-    pub fn update(self: *LoadDatum) LoadErr!void {
-        var err_code = cStdlib.getloadavg(&self.loads, 3);
-        switch (err_code) {
-            -1 => return LoadErr.GeneralFail,
-            else => {},
-        }
-        return;
+    var err_code = cStdlib.getloadavg(&loads, 3);
+    if (err_code < 0) {
+        return 2;
     }
-};
+
+    // format the output to the buffer
+    _ = fmt.bufPrint(buf[start..end], "{d:.2} |", .{loads[0]}) catch |err| {
+        switch (err) {
+            else => {
+                return 3;
+            },
+        }
+    };
+    return 0;
+}
 
 // end Load.zig

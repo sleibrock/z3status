@@ -15,14 +15,11 @@
 const std = @import("std");
 const fs = std.fs;
 const cTime = @cImport(@cInclude("time.h"));
+const S = @import("Settings.zig");
+const Utils = @import("utils.zig");
 
-const TimeErr = error{
-    Update, // failed to update time from system
-    IO, // failed to output text
-    Other, // some other error
-};
-
-pub fn update(start: u8, end: u8, buf: *[128]u8) !void {
+pub fn update(start: u8, end: u8, buf: *[128]u8, s: S.AppSettings) Utils.UtilErr!u8 {
+    _ = s;
     var time_raw: cTime.time_t = undefined;
     var time_info: cTime.struct_tm = undefined;
     var output: [20]u8 = undefined;
@@ -32,18 +29,19 @@ pub fn update(start: u8, end: u8, buf: *[128]u8) !void {
     // this function returns the number of characters actually used
     const c_used = cTime.strftime(&output, 20, "%Y-%m-%d %H:%M:%S", &time_info);
     if (c_used == 0) {
-        return TimeErr.IO;
+        return 1;
     }
 
     // copy the values from local output to main buffer
-    var c_index: usize = c_used - 1;
+    var c_index: usize = c_used;
     var end_index: usize = end;
-    while ((c_index >= 0) and (end_index > start)) : (c_index -= 1) {
+    while ((c_index > 0) and (end_index > start)) {
+        c_index -= 1;
         buf[end_index] = output[c_index];
         end_index -= 1;
     }
 
-    return;
+    return 0;
 }
 
 // end Time.zig
