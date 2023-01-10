@@ -22,7 +22,7 @@ pub fn update(start: u8, end: u8, buf: *[128]u8, s: S.AppSettings) Utils.UtilErr
     }
 
     // format the output to the buffer
-    _ = fmt.bufPrint(buf[start..end], "{d:.2} |", .{loads[0]}) catch |err| {
+    _ = fmt.bufPrint(buf[start..end], " {d:.2} |", .{loads[0]}) catch |err| {
         switch (err) {
             else => {
                 return 3;

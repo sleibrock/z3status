@@ -31,8 +31,8 @@ const Widget = struct {
 };
 
 const widgets = [_]Widget{
-    Widget{ .start = 91, .end = 101, .updater = &Memory.update },
-    Widget{ .start = 101, .end = 107, .updater = &Load.update },
+    Widget{ .start = 82, .end = 100, .updater = &Memory.update },
+    Widget{ .start = 100, .end = 107, .updater = &Load.update },
     Widget{ .start = 107, .end = 127, .updater = &Time.update },
 };
 
@@ -45,7 +45,12 @@ pub fn main() !void {
     }
     while (true) {
         for (widgets) |widget| {
-            _ = try widget.updater(widget.start, widget.end, &chars, .None);
+            _ = try widget.updater(
+                widget.start,
+                widget.end,
+                &chars,
+                .None,
+            );
         }
 
         try stdout.print("{s}\n", .{chars});

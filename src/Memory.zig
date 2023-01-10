@@ -1,5 +1,7 @@
 // Memory.zig
 
+//                                                                              3.2 GB | 59.4 GB |      0.33 |  2023-01-10 00:50:01
+
 // This is a module dedicated to calculating currently used
 // memory on a system. It works by using the /proc/meminfo file
 // and calculating total memory usage in the file.
@@ -67,9 +69,15 @@ pub fn update(start: u8, end: u8, buf: *[128]u8, s: S.AppSettings) Utils.UtilErr
     }
 
     // format an output
-    var symbol: u8 = 0;
-    var bytes = Utils.humanReadableBytes(ram_free, 1024, &symbol);
-    _ = fmt.bufPrint(buf[start..end], "{d:.1} {c}B | ", .{ bytes, Utils.getSymbol(symbol) }) catch |err| {
+    var sym1: u8 = 0;
+    var sym2: u8 = 0;
+    var used = Utils.humanReadableBytes(ram_used, 1024, &sym1);
+    var free = Utils.humanReadableBytes(ram_free, 1024, &sym2);
+    _ = fmt.bufPrint(
+        buf[start..end],
+        "{d:.1} {c}B | {d:.1} {c}B | ",
+        .{ used, Utils.getSymbol(sym1), free, Utils.getSymbol(sym2) },
+    ) catch |err| {
         switch (err) {
             else => {
                 return 50;
@@ -81,3 +89,4 @@ pub fn update(start: u8, end: u8, buf: *[128]u8, s: S.AppSettings) Utils.UtilErr
 }
 
 // end Memory.zig
+
